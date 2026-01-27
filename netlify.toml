@@ -1,7 +1,4 @@
 [build]
   base = "Desktop/desert_echoes/desert-echoes"
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = "dist"
-
-[build.environment]
-  NODE_ENV = "production"
