@@ -1,0 +1,272 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { HarmoniumPagination } from '@/components/HarmoniumPagination';
+import { SandTransition } from '@/components/SandTransition';
+import { SoundToggle } from '@/components/SoundToggle';
+import { PlayPauseToggle } from '@/components/PlayPauseToggle';
+import { AudioProvider } from '@/contexts/AudioContext';
+import { Page1 } from '@/components/pages/Page1';
+import { Page2 } from '@/components/pages/Page2';
+import { PageCollaborations } from '@/components/pages/PageCollaborations';
+import { Page3 } from '@/components/pages/Page3';
+import { Page4 } from '@/components/pages/Page4';
+import { Page5 } from '@/components/pages/Page5';
+import { Page6 } from '@/components/pages/Page6';
+import { Page7 } from '@/components/pages/Page7';
+import { Page8 } from '@/components/pages/Page8';
+import { Page9 } from '@/components/pages/Page9';
+import { Page10 } from '@/components/pages/Page10';
+import { Page11 } from '@/components/pages/Page11';
+import { PageQuotes } from '@/components/pages/PageQuotes';
+import { Page12 } from '@/components/pages/Page12';
+
+const TOTAL_PAGES = 14;
+const SWIPE_THRESHOLD = 50;
+const WHEEL_THRESHOLD = 30;
+const DEBOUNCE_TIME = 800;
+const AUTO_SLIDE_DURATION = 13000; // 13 seconds for auto-slide
+
+// Video timestamps - kept for reference, clip already trimmed
+const PAGE2_CLIP_PATH = '/assets/videos/page2_clip.mp4';
+
+const Index = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'up' | 'down'>('down');
+  const [showSandTransition, setShowSandTransition] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  const touchStartY = useRef(0);
+  const lastNavigationTime = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const manganiyarsVideoRef = useRef<HTMLVideoElement>(null);
+  const autoSlideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const navigateToPage = useCallback((targetPage: number, direction?: 'up' | 'down', skipDebounce?: boolean) => {
+    const now = Date.now();
+    if (!skipDebounce && now - lastNavigationTime.current < DEBOUNCE_TIME) return;
+    if (targetPage < 0 || targetPage >= TOTAL_PAGES) return;
+    if (targetPage === currentPage) return;
+    
+    lastNavigationTime.current = now;
+    setIsTransitioning(true);
+    setTransitionDirection(direction || (targetPage > currentPage ? 'down' : 'up'));
+    setShowSandTransition(true);
+    
+    // Change page after sand animation starts
+    setTimeout(() => {
+      setCurrentPage(targetPage);
+    }, 300);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 1000);
+  }, [currentPage]);
+
+  // Auto-slide timer for all pages (except Page5 which has its own slideshow timer)
+  useEffect(() => {
+    // Clear any existing timer
+    if (autoSlideTimerRef.current) {
+      clearTimeout(autoSlideTimerRef.current);
+      autoSlideTimerRef.current = null;
+    }
+
+    // Don't auto-slide if paused or on the last page
+    // Also skip Page5 (index 5) as it has its own slideshow-based navigation
+    if (isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5) {
+      return;
+    }
+
+    // Set timer for auto-slide
+    autoSlideTimerRef.current = setTimeout(() => {
+      navigateToPage(currentPage + 1, 'down', true);
+    }, AUTO_SLIDE_DURATION);
+
+    return () => {
+      if (autoSlideTimerRef.current) {
+        clearTimeout(autoSlideTimerRef.current);
+      }
+    };
+  }, [currentPage, isPaused, navigateToPage]);
+
+  // Handler for Page5 slideshow completion
+  const handleSlideshowComplete = useCallback(() => {
+    if (!isPaused) {
+      navigateToPage(6, 'down', true);
+    }
+  }, [navigateToPage, isPaused]);
+
+  const handleNext = useCallback(() => {
+    if (currentPage < TOTAL_PAGES - 1) {
+      navigateToPage(currentPage + 1, 'down');
+    }
+  }, [currentPage, navigateToPage]);
+
+  const handlePrev = useCallback(() => {
+    if (currentPage > 0) {
+      navigateToPage(currentPage - 1, 'up');
+    }
+  }, [currentPage, navigateToPage]);
+
+  // Toggle pause/play
+  const handleTogglePause = useCallback(() => {
+    setIsPaused(prev => !prev);
+  }, []);
+
+  // Wheel navigation
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      
+      if (Math.abs(e.deltaY) > WHEEL_THRESHOLD) {
+        if (e.deltaY > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, [handleNext, handlePrev]);
+
+  // Touch navigation
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY.current - touchEndY;
+
+      if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
+        if (deltaY > 0) {
+          handleNext();
+        } else {
+          handlePrev();
+        }
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchend', handleTouchEnd);
+      }
+    };
+  }, [handleNext, handlePrev]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        handlePrev();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNext, handlePrev]);
+
+  const handleSandTransitionComplete = () => {
+    setShowSandTransition(false);
+  };
+
+  // Handle video ended to loop the clipped video
+  const handleVideoEnded = useCallback(() => {
+    if (manganiyarsVideoRef.current) {
+      manganiyarsVideoRef.current.currentTime = 0;
+      manganiyarsVideoRef.current.play().catch(console.error);
+    }
+  }, []);
+
+  // Determine if video should be visible (on Page 1 for audio or Page 2 for video)
+  const showVideo = currentPage === 0 || currentPage === 1;
+
+  return (
+    <AudioProvider>
+      <div 
+        ref={containerRef}
+        className="fixed inset-0 overflow-hidden bg-background cursor-default select-none"
+      >
+        {/* Shared Manganiyars Video Element - plays audio on Page1, video+audio on Page2 */}
+        <video
+          ref={manganiyarsVideoRef}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          style={{ 
+            opacity: currentPage === 1 ? 1 : 0,
+            zIndex: currentPage === 1 ? 5 : -1,
+            pointerEvents: currentPage === 1 ? 'auto' : 'none'
+          }}
+          playsInline
+          preload="auto"
+          onEnded={handleVideoEnded}
+          loop
+        >
+          <source src={PAGE2_CLIP_PATH} type="video/mp4" />
+        </video>
+
+        {/* Sand Transition Effect */}
+        <SandTransition 
+          isActive={showSandTransition}
+          direction={transitionDirection}
+          onComplete={handleSandTransitionComplete}
+        />
+        
+        {/* Pages */}
+        <Page1 
+          isActive={currentPage === 0} 
+          audioRef={manganiyarsVideoRef}
+          isPaused={isPaused}
+        />
+        <Page2 isActive={currentPage === 1} videoRef={manganiyarsVideoRef} />
+        <PageCollaborations isActive={currentPage === 2} />
+        <Page3 isActive={currentPage === 3} />
+        <Page4 isActive={currentPage === 4} />
+        <Page5 isActive={currentPage === 5} onSlideshowComplete={handleSlideshowComplete} />
+        <Page6 isActive={currentPage === 6} />
+        <Page7 isActive={currentPage === 7} />
+        <Page8 isActive={currentPage === 8} audioRef={manganiyarsVideoRef} />
+        <Page9 isActive={currentPage === 9} />
+        <Page10 isActive={currentPage === 10} />
+        <Page11 isActive={currentPage === 11} />
+        <PageQuotes isActive={currentPage === 12} audioRef={manganiyarsVideoRef} />
+        <Page12 isActive={currentPage === 13} />
+        
+        {/* Harmonium-style Pagination */}
+        <HarmoniumPagination
+          totalPages={TOTAL_PAGES}
+          currentPage={currentPage}
+          onPageChange={(page) => navigateToPage(page)}
+        />
+        
+        {/* Sound Toggle Button - Bottom Left */}
+        <SoundToggle />
+        
+        {/* Play/Pause Toggle Button - Bottom Right */}
+        <PlayPauseToggle isPaused={isPaused} onToggle={handleTogglePause} />
+      </div>
+    </AudioProvider>
+  );
+};
+
+export default Index;
