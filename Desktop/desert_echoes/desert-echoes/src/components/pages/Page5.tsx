@@ -9,7 +9,7 @@ interface Page5Props {
 }
 
 // Video path - use the available video or replace with page5_video.mp4 when provided
-const VIDEO_PATH = '/assets/videos/page12_quotes.mp4';
+const VIDEO_PATH = '/assets/videos/page8_clip.mp4';
 
 export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete, audioRef }) => {
   const videoRef = useRef<HTMLVideoElement>(null);

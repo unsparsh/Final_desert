@@ -162,7 +162,7 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
   return (
     <PageWrapper isActive={isActive} overlayOpacity={0.3}>
       {/* Background YouTube Video - Desert & Camel (always muted) */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.78vh] scale-[1.35]">
         <div
           id="youtube-player-page1"
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[56.25vw] min-h-[100vh] min-w-[177.78vh]"
