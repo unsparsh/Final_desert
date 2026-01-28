@@ -6,27 +6,27 @@ interface Page10Props {
 }
 
 const concertHalls = [
-  { venue: "Lincoln Centre New York", attendance: "2,200" },
-  { venue: "Kennedy Centre Washington DC", attendance: "2,400" },
   { venue: "Royal Albert Hall London", attendance: "4,800" },
-  { venue: "Queen Elizabeth Hall, London", attendance: "916" },
-  { venue: "The Barbican, London", attendance: "1,650" },
-  { venue: "Philharmonie Paris", attendance: "2,400" },
-  { venue: "Institute Du Monde Arabe Paris", attendance: "420" },
-  { venue: "Theatre De La Ville Paris", attendance: "901" },
   { venue: "Sydney Opera House", attendance: "2,670" },
+  { venue: "Kennedy Centre Washington DC", attendance: "2,400" },
+  { venue: "Philharmonie Paris", attendance: "2,400" },
+  { venue: "Lincoln Centre New York", attendance: "2,200" },
   { venue: "NMACC Mumbai", attendance: "2,000" },
+  { venue: "The Barbican, London", attendance: "1,650" },
   { venue: "King Abdulaziz Auditorium Saudi Arabia", attendance: "930" },
+  { venue: "Queen Elizabeth Hall, London", attendance: "916" },
+  { venue: "Theatre De La Ville Paris", attendance: "901" },
+  { venue: "Institute Du Monde Arabe Paris", attendance: "420" },
 ];
 
 const festivals = [
+  { venue: "NH7 Festival", attendance: "100,000" },
   { venue: "Sydney Festival", attendance: "60,000" },
+  { venue: "WOMAD Festival UK", attendance: "40,000" },
+  { venue: "Wonderfruit", attendance: "28,000" },
+  { venue: "Kingfisher Festival", attendance: "20,000" },
   { venue: "Fez Festival Morocco", attendance: "10,000" },
   { venue: "RIFF Festival", attendance: "5,000" },
-  { venue: "Kingfisher Festival", attendance: "20,000" },
-  { venue: "NH7 Festival", attendance: "100,000" },
-  { venue: "Wonderfruit", attendance: "28,000" },
-  { venue: "WOMAD Festival UK", attendance: "40,000" },
 ];
 
 export const Page10: React.FC<Page10Props> = ({ isActive }) => {

@@ -9,7 +9,7 @@ interface AudioContextType {
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isMuted, setIsMuted] = useState(true); // Start muted due to autoplay policy
+  const [isMuted, setIsMuted] = useState(false); // Start unmuted - audio plays by default
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => !prev);

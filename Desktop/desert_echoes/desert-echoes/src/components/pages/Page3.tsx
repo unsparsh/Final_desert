@@ -1,71 +1,100 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PageWrapper } from '@/components/PageWrapper';
-import { StaggeredText } from '@/components/AnimatedText';
 
 interface Page3Props {
   isActive: boolean;
 }
 
 const venues = [
-  "Royal Albert Hall, London",
-  "Sydney Opera House, Australia",
-  "Carnegie Hall, New York",
-  "Barbican Centre, London",
-  "Theatre de la Ville, Paris",
-  "National Concert Hall, Dublin",
-  "Konzerthaus, Berlin",
-  "Concertgebouw, Amsterdam",
+  "LINCOLN CENTRE NEW YORK",
+  "KENNEDY CENTRE WASHINGTON DC",
+  "ROYAL ALBERT HALL LONDON",
+  "QUEEN ELIZABETH HALL, LONDON",
+  "THE BARBICAN, LONDON",
+  "WOMAD FESTIVAL UK",
+  "PHILHARMONIE PARIS",
+  "INSTITUTE DU MONDE ARABE PARIS",
+  "THEATRE DE LA VILLE PARIS",
+  "SYDNEY OPERA HOUSE",
+  "SYDNEY FESTIVAL",
+  "KING ABDULAZIZ AUDITORIUM SAUDI ARABIA",
+  "FEZ FESTIVAL MOROCCO",
+  "NMACC MUMBAI",
 ];
 
+const AUTO_SCROLL_DURATION = 13000; // 13 seconds total scroll time
+
 export const Page3: React.FC<Page3Props> = ({ isActive }) => {
-  const [showIntro, setShowIntro] = useState(false);
-  const [showVenues, setShowVenues] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
+  const startTimeRef = useRef<number>();
 
   useEffect(() => {
     if (isActive) {
-      setTimeout(() => setShowIntro(true), 300);
-      setTimeout(() => setShowVenues(true), 1200);
+      setTimeout(() => setShowContent(true), 300);
+      
+      // Start auto-scroll animation
+      startTimeRef.current = undefined;
+      const animate = (timestamp: number) => {
+        if (!startTimeRef.current) startTimeRef.current = timestamp;
+        const elapsed = timestamp - startTimeRef.current;
+        const progress = Math.min(elapsed / AUTO_SCROLL_DURATION, 1);
+        
+        // Scroll the container
+        if (scrollContainerRef.current) {
+          const scrollHeight = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
+          scrollContainerRef.current.scrollTop = scrollHeight * progress;
+        }
+        
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animate);
+        }
+      };
+      
+      // Delay scroll start by 1 second to let initial content be visible
+      setTimeout(() => {
+        animationRef.current = requestAnimationFrame(animate);
+      }, 1000);
+      
     } else {
-      setShowIntro(false);
-      setShowVenues(false);
+      setShowContent(false);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     }
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, [isActive]);
 
   return (
     <PageWrapper isActive={isActive} backgroundColor="bg-secondary">
-      <div className="max-w-5xl mx-auto text-center">
+      <div 
+        ref={scrollContainerRef}
+        className={`w-full h-full flex flex-col items-center px-6 md:px-12 lg:px-16 py-8 overflow-hidden transition-opacity duration-1000 ${
+          showContent ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         {/* Intro text */}
-        <p
-          className={`font-display text-lg md:text-xl lg:text-2xl font-light text-muted-foreground mb-12 transition-all duration-1000 italic ${
-            showIntro ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
+        <p className="font-display text-base md:text-lg lg:text-xl font-light text-muted-foreground mb-4 md:mb-6 text-center max-w-3xl">
           They have sold out concerts in the most prestigious venues worldwide
         </p>
         
-        <p
-          className={`font-display text-xs md:text-sm text-muted-foreground/50 mb-8 tracking-[0.3em] transition-all duration-700 delay-500 ${
-            showIntro ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          TO NAME A FEW
+        {/* To Name A Few - smaller text */}
+        <p className="font-display text-xs md:text-sm text-muted-foreground/50 mb-8 uppercase tracking-[0.3em]">
+          to name a few
         </p>
         
-        {/* Venues - Single Column */}
-        <div
-          className={`flex flex-col items-center gap-4 md:gap-5 transition-all duration-1000 ${
-            showVenues ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
+        {/* Vertical List of Venues */}
+        <div className="flex flex-col items-center gap-4 md:gap-5 max-w-2xl">
           {venues.map((venue, index) => (
-            <div
-              key={venue}
-              className="transition-all duration-700"
-              style={{
-                transitionDelay: showVenues ? `${index * 120}ms` : '0ms',
-                opacity: showVenues ? 1 : 0,
-                transform: showVenues ? 'translateY(0)' : 'translateY(15px)',
-              }}
+            <div 
+              key={venue} 
+              className="text-center"
             >
               <p className="font-display text-lg md:text-xl lg:text-2xl font-light text-foreground">
                 {venue}
@@ -73,6 +102,9 @@ export const Page3: React.FC<Page3Props> = ({ isActive }) => {
             </div>
           ))}
         </div>
+        
+        {/* Extra spacing for scroll */}
+        <div className="h-16 md:h-24" />
       </div>
     </PageWrapper>
   );

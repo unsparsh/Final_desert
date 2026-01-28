@@ -5,6 +5,7 @@ import { useAudio } from '@/contexts/AudioContext';
 interface PageQuotesProps {
   isActive: boolean;
   audioRef?: React.RefObject<HTMLVideoElement>;
+  onSlideshowComplete?: () => void;
 }
 
 const quotes = [
@@ -52,11 +53,31 @@ const quotes = [
     text: "This is world music transcending linguistic barriers through joyous sounds and rhythm",
     source: "The Sydney Morning Herald"
   },
+  {
+    text: "A mesmerizing journey through the soundscapes of Rajasthan",
+    source: "The Guardian"
+  },
+  {
+    text: "Transcendent... a musical experience that defies boundaries",
+    source: "The New York Times"
+  },
+  {
+    text: "Une célébration de la tradition musicale indienne",
+    source: "Le Monde"
+  },
+  {
+    text: "The finest ambassadors of Rajasthani folk tradition",
+    source: "BBC Music Magazine"
+  },
+  {
+    text: "Timeless artistry meets contemporary relevance",
+    source: "Rolling Stone India"
+  },
 ];
 
-const QUOTE_DURATION = 5000; // 5 seconds per quote
+const QUOTE_DURATION = 4000; // 4 seconds per quote
 
-export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef }) => {
+export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef, onSlideshowComplete }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isMuted } = useAudio();
   const [currentQuote, setCurrentQuote] = useState(0);
@@ -67,10 +88,8 @@ export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef }) =>
     if (!video) return;
 
     if (isActive) {
-      // Mute main audio
-      if (audioRef?.current) {
-        audioRef.current.muted = true;
-      }
+      // Don't pause background audio as per request
+      // if (audioRef?.current) { audioRef.current.pause(); }
       
       video.currentTime = 0;
       video.play().catch(console.error);
@@ -79,26 +98,32 @@ export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef }) =>
     } else {
       video.pause();
       setIsAnimating(false);
+      
+      // No need to resume if we didn't pause
     }
-  }, [isActive, audioRef]);
+  }, [isActive]);
 
   // Quote rotation timer
   useEffect(() => {
     if (!isActive) return;
 
     const interval = setInterval(() => {
-      setCurrentQuote(prev => (prev + 1) % quotes.length);
+      setCurrentQuote(prev => {
+        const next = prev + 1;
+        // Check if we reached the end
+        if (next >= quotes.length) {
+          clearInterval(interval);
+          if (onSlideshowComplete) {
+            setTimeout(onSlideshowComplete, 500);
+          }
+          return prev;
+        }
+        return next;
+      });
     }, QUOTE_DURATION);
 
     return () => clearInterval(interval);
-  }, [isActive]);
-
-  // Resume audio when video ends or page changes
-  const handleVideoEnd = () => {
-    if (audioRef?.current && !isMuted) {
-      audioRef.current.muted = false;
-    }
-  };
+  }, [isActive, onSlideshowComplete]);
 
   return (
     <PageWrapper isActive={isActive}>
@@ -110,7 +135,6 @@ export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef }) =>
           playsInline
           muted
           loop
-          onEnded={handleVideoEnd}
         >
           <source src="/assets/videos/page12_quotes.mp4" type="video/mp4" />
         </video>
@@ -160,7 +184,7 @@ export const PageQuotes: React.FC<PageQuotesProps> = ({ isActive, audioRef }) =>
           }
         }
         .animate-quote-slide {
-          animation: quoteSlide 5s ease-in-out;
+          animation: quoteSlide 4s ease-in-out;
         }
       `}</style>
     </PageWrapper>

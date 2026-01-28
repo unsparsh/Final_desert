@@ -5,12 +5,13 @@ import { useAudio } from '@/contexts/AudioContext';
 interface Page5Props {
   isActive: boolean;
   onSlideshowComplete?: () => void;
+  audioRef?: React.RefObject<HTMLVideoElement>;
 }
 
 // Video path - use the available video or replace with page5_video.mp4 when provided
 const VIDEO_PATH = '/assets/videos/page12_quotes.mp4';
 
-export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete }) => {
+export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete, audioRef }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasCompletedRef = useRef(false);
   const { isMuted } = useAudio();
@@ -25,13 +26,18 @@ export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete }) =
       return;
     }
 
+    // Pause background audio when this page becomes active
+    if (audioRef?.current) {
+      audioRef.current.pause();
+    }
+
     // Start video when page becomes active
     if (videoRef.current) {
       videoRef.current.muted = isMuted;
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch(console.error);
     }
-  }, [isActive, isMuted]);
+  }, [isActive, isMuted, audioRef]);
 
   // Handle mute changes
   useEffect(() => {
@@ -41,9 +47,17 @@ export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete }) =
   }, [isMuted]);
 
   const handleVideoEnd = () => {
-    if (!hasCompletedRef.current && onSlideshowComplete) {
+    if (!hasCompletedRef.current) {
       hasCompletedRef.current = true;
-      onSlideshowComplete();
+      
+      // Resume background audio before navigating to next page
+      if (audioRef?.current) {
+        audioRef.current.play().catch(console.error);
+      }
+      
+      if (onSlideshowComplete) {
+        onSlideshowComplete();
+      }
     }
   };
 

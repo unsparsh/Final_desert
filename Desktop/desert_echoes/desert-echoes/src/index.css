@@ -104,9 +104,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
     overflow: hidden;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.3em;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -134,3 +135,9 @@
     pointer-events: none;
   }
 }
+
+/* Hide YouTube info bar/title overlay */
+#youtube-player-page1 iframe {
+  clip-path: inset(10% 0 0 0); /* Crop top 10% to hide title */
+}
+

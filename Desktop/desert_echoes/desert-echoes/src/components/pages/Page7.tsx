@@ -52,7 +52,7 @@ export const Page7: React.FC<Page7Props> = ({ isActive }) => {
           </p>
           
           <p 
-            className={`font-body text-sm md:text-base lg:text-lg font-light text-foreground/85 leading-relaxed transition-all duration-1000 ${
+            className={`font-display text-sm md:text-base lg:text-lg font-light text-foreground/85 leading-relaxed transition-all duration-1000 ${
               showPara3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ textShadow: '0 2px 20px hsl(var(--background) / 0.9)' }}
@@ -61,7 +61,7 @@ export const Page7: React.FC<Page7Props> = ({ isActive }) => {
           </p>
           
           <p 
-            className={`font-body text-sm md:text-base lg:text-lg font-light text-foreground/80 leading-relaxed transition-all duration-1000 ${
+            className={`font-display text-sm md:text-base lg:text-lg font-light text-foreground/80 leading-relaxed transition-all duration-1000 ${
               showPara3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ textShadow: '0 2px 20px hsl(var(--background) / 0.9)' }}

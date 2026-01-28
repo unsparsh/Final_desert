@@ -52,6 +52,8 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
             showinfo: 0,
             mute: 1, // YouTube video always muted - audio comes from Manganiyars
             start: YOUTUBE_CLIPS[0].start,
+            cc_load_policy: 0, // Hide captions
+            enablejsapi: 1,
           },
           events: {
             onReady: (event: any) => {
@@ -188,7 +190,7 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
           }`}
         >
           <div className="text-center max-w-4xl px-8">
-            <p className="font-display text-xl md:text-3xl lg:text-4xl font-light text-foreground/90 leading-relaxed italic">
+            <p className="font-display text-xl md:text-3xl lg:text-4xl font-light text-foreground/90 ">
               Music of the Desert of Rajasthan
             </p>
           </div>

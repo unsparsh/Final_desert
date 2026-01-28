@@ -6,7 +6,6 @@ interface Page12Props {
 }
 
 const backgroundImages = [
-  '/assets/Images/PAGE_13-a.jpg',
   '/assets/Images/PAGE_13-b.png',
 ];
 
