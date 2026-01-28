@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { HarmoniumPagination } from '@/components/HarmoniumPagination';
 import { SandTransition } from '@/components/SandTransition';
-import { SoundToggle } from '@/components/SoundToggle';
+
 import { PlayPauseToggle } from '@/components/PlayPauseToggle';
 import { AudioProvider } from '@/contexts/AudioContext';
 import { Page1 } from '@/components/pages/Page1';
@@ -15,15 +15,26 @@ import { Page7 } from '@/components/pages/Page7';
 import { Page8 } from '@/components/pages/Page8';
 import { Page9 } from '@/components/pages/Page9';
 import { Page10 } from '@/components/pages/Page10';
-import { Page11 } from '@/components/pages/Page11';
 import { PageQuotes } from '@/components/pages/PageQuotes';
 import { Page12 } from '@/components/pages/Page12';
 
-const TOTAL_PAGES = 14;
+const TOTAL_PAGES = 13; // Total pages in the presentation
 const SWIPE_THRESHOLD = 50;
 const WHEEL_THRESHOLD = 30;
 const DEBOUNCE_TIME = 800;
-const AUTO_SLIDE_DURATION = 13000; // 13 seconds for auto-slide
+const AUTO_SLIDE_DURATION = 13000; // Default: 13 seconds for auto-slide
+
+// Custom timing for specific pages (in milliseconds)
+const getPageDuration = (pageIndex: number): number => {
+  switch (pageIndex) {
+    case 2: return 22000;  // Page 3 (Collaborations) - 22 seconds (+6s)
+    case 3: return 19000;  // Page 4 (Venues) - 19 seconds (+6s)
+    case 5: return 17000;  // Page 6 - 17 seconds
+    case 6: return 17000;  // Page 7 - 17 seconds
+    case 10: return 14000; // Page 11 (Attendance) - 14 seconds
+    default: return AUTO_SLIDE_DURATION;
+  }
+};
 
 // Video path - using pre-clipped video
 const PAGE2_CLIP_PATH = '/assets/videos/page2_clip.mp4';
@@ -34,6 +45,7 @@ const Index = () => {
   const [transitionDirection, setTransitionDirection] = useState<'up' | 'down'>('down');
   const [showSandTransition, setShowSandTransition] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   
   const touchStartY = useRef(0);
   const lastNavigationTime = useRef(0);
@@ -71,15 +83,15 @@ const Index = () => {
     }
 
     // Don't auto-slide if paused or on the last page
-    // Also skip Page5 (index 5) as it has its own slideshow-based navigation
-    if (isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5) {
+    // Also skip Page5 (index 5) and PageQuotes (index 11) as they have their own slideshow-based navigation
+    if (isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5 || currentPage === 11) {
       return;
     }
 
-    // Set timer for auto-slide
+    // Set timer for auto-slide with custom duration per page
     autoSlideTimerRef.current = setTimeout(() => {
       navigateToPage(currentPage + 1, 'down', true);
-    }, AUTO_SLIDE_DURATION);
+    }, getPageDuration(currentPage));
 
     return () => {
       if (autoSlideTimerRef.current) {
@@ -88,12 +100,38 @@ const Index = () => {
     };
   }, [currentPage, isPaused, navigateToPage]);
 
-  // Handler for Page5 slideshow completion
+  // Handler for Page5 slideshow completion (goes to page 6)
   const handleSlideshowComplete = useCallback(() => {
     if (!isPaused) {
       navigateToPage(6, 'down', true);
     }
   }, [navigateToPage, isPaused]);
+
+  // Handler for Page8 slideshow completion (goes to page 9)
+  const handlePage8SlideshowComplete = useCallback(() => {
+    if (!isPaused) {
+      navigateToPage(9, 'down', true);
+    }
+  }, [navigateToPage, isPaused]);
+
+  // Handler for PageQuotes completion (goes to page 12)
+  const handleQuotesComplete = useCallback(() => {
+    if (!isPaused) {
+      navigateToPage(12, 'down', true);
+    }
+  }, [navigateToPage, isPaused]);
+
+  // Start audio on first user interaction (browser autoplay policy)
+  const handleFirstInteraction = useCallback(() => {
+
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      if (manganiyarsVideoRef.current && currentPage === 0) {
+        manganiyarsVideoRef.current.currentTime = 195;
+        manganiyarsVideoRef.current.play().catch(console.error);
+      }
+    }
+  }, [hasInteracted, currentPage]);
 
   const handleNext = useCallback(() => {
     if (currentPage < TOTAL_PAGES - 1) {
@@ -199,6 +237,17 @@ const Index = () => {
     }
   }, []);
 
+  // Start audio on mount
+  useEffect(() => {
+    if (manganiyarsVideoRef.current) {
+      manganiyarsVideoRef.current.currentTime = 195; // Start at 3:15
+      manganiyarsVideoRef.current.play().catch(() => {
+        // Autoplay blocked, will play on first interaction
+        console.log('Autoplay blocked, waiting for user interaction');
+      });
+    }
+  }, []);
+
   // Determine if video should be visible (on Page 1 for audio or Page 2 for video)
   const showVideo = currentPage === 0 || currentPage === 1;
 
@@ -207,6 +256,7 @@ const Index = () => {
       <div 
         ref={containerRef}
         className="fixed inset-0 overflow-hidden bg-background cursor-default select-none"
+        onClick={handleFirstInteraction}
       >
         {/* Shared Manganiyars Video Element - plays audio on Page1, video+audio on Page2 */}
         <video
@@ -219,6 +269,7 @@ const Index = () => {
           }}
           playsInline
           preload="auto"
+          autoPlay
           onEnded={handleVideoEnded}
           loop
         >
@@ -242,15 +293,14 @@ const Index = () => {
         <PageCollaborations isActive={currentPage === 2} />
         <Page3 isActive={currentPage === 3} />
         <Page4 isActive={currentPage === 4} />
-        <Page5 isActive={currentPage === 5} onSlideshowComplete={handleSlideshowComplete} />
+        <Page5 isActive={currentPage === 5} onSlideshowComplete={handleSlideshowComplete} audioRef={manganiyarsVideoRef} />
         <Page6 isActive={currentPage === 6} />
         <Page7 isActive={currentPage === 7} />
-        <Page8 isActive={currentPage === 8} audioRef={manganiyarsVideoRef} onSlideshowComplete={handleSlideshowComplete} />
+        <Page8 isActive={currentPage === 8} audioRef={manganiyarsVideoRef} onSlideshowComplete={handlePage8SlideshowComplete} />
         <Page9 isActive={currentPage === 9} />
         <Page10 isActive={currentPage === 10} />
-        <Page11 isActive={currentPage === 11} />
-        <PageQuotes isActive={currentPage === 12} audioRef={manganiyarsVideoRef} />
-        <Page12 isActive={currentPage === 13} />
+        <PageQuotes isActive={currentPage === 11} audioRef={manganiyarsVideoRef} onSlideshowComplete={handleQuotesComplete} />
+        <Page12 isActive={currentPage === 12} />
         
         {/* Harmonium-style Pagination */}
         <HarmoniumPagination
@@ -259,8 +309,7 @@ const Index = () => {
           onPageChange={(page) => navigateToPage(page)}
         />
         
-        {/* Sound Toggle Button - Bottom Left */}
-        <SoundToggle />
+
         
         {/* Play/Pause Toggle Button - Bottom Right */}
         <PlayPauseToggle isPaused={isPaused} onToggle={handleTogglePause} />

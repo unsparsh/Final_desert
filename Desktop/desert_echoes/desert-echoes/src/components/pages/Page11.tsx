@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PageWrapper } from '@/components/PageWrapper';
 
 interface Page11Props {
   isActive: boolean;
+  onSlideshowComplete?: () => void;
 }
 
 const pressItems = [
@@ -33,20 +34,32 @@ const pressItems = [
   },
 ];
 
-export const Page11: React.FC<Page11Props> = ({ isActive }) => {
+export const Page11: React.FC<Page11Props> = ({ isActive, onSlideshowComplete }) => {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (isActive) {
+      completedRef.current = false;
       pressItems.forEach((_, index) => {
         setTimeout(() => {
           setVisibleItems(prev => [...prev, index]);
+          // Check if this is the last item
+          if (index === pressItems.length - 1 && !completedRef.current) {
+            completedRef.current = true;
+            // Wait for the last item animation to complete, then navigate
+            setTimeout(() => {
+              if (onSlideshowComplete) {
+                onSlideshowComplete();
+              }
+            }, 1500); // 1.5 second delay after last item appears
+          }
         }, 300 + index * 250);
       });
     } else {
       setVisibleItems([]);
     }
-  }, [isActive]);
+  }, [isActive, onSlideshowComplete]);
 
   return (
     <PageWrapper isActive={isActive} backgroundColor="bg-secondary">

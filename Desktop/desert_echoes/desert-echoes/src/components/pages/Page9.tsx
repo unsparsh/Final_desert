@@ -46,7 +46,7 @@ const regions = [
   },
 ];
 
-const AUTO_NAV_DURATION = 5000;
+const AUTO_NAV_DURATION = 4000;
 
 // User's custom 3D world map image
 const WORLD_MAP_IMAGE = '/assets/Images/SL-070722-51460-10.jpg';
@@ -71,9 +71,13 @@ export const Page9: React.FC<Page9Props> = ({ isActive }) => {
       return;
     }
 
+    const duration = regions[activeRegion].name === 'UNITED STATES' 
+      ? 14000 // 14 seconds for US
+      : AUTO_NAV_DURATION;
+
     timerRef.current = setTimeout(() => {
       setActiveRegion(prev => (prev + 1) % regions.length);
-    }, AUTO_NAV_DURATION);
+    }, duration);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
