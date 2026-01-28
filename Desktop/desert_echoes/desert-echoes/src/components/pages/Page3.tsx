@@ -44,16 +44,16 @@ export const Page3: React.FC<Page3Props> = ({ isActive }) => {
         </p>
         
         <p
-          className={`font-body text-sm md:text-base text-muted-foreground/60 mb-8 uppercase tracking-[0.3em] transition-all duration-700 delay-500 ${
+          className={`font-display text-xs md:text-sm text-muted-foreground/50 mb-8 tracking-[0.3em] transition-all duration-700 delay-500 ${
             showIntro ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          to name a few
+          TO NAME A FEW
         </p>
         
-        {/* Venues */}
+        {/* Venues - Single Column */}
         <div
-          className={`grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 transition-all duration-1000 ${
+          className={`flex flex-col items-center gap-4 md:gap-5 transition-all duration-1000 ${
             showVenues ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -62,12 +62,12 @@ export const Page3: React.FC<Page3Props> = ({ isActive }) => {
               key={venue}
               className="transition-all duration-700"
               style={{
-                transitionDelay: showVenues ? `${index * 150}ms` : '0ms',
+                transitionDelay: showVenues ? `${index * 120}ms` : '0ms',
                 opacity: showVenues ? 1 : 0,
-                transform: showVenues ? 'translateY(0)' : 'translateY(20px)',
+                transform: showVenues ? 'translateY(0)' : 'translateY(15px)',
               }}
             >
-              <p className="font-display text-xl md:text-2xl lg:text-3xl font-light text-foreground">
+              <p className="font-display text-lg md:text-xl lg:text-2xl font-light text-foreground">
                 {venue}
               </p>
             </div>

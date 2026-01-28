@@ -25,7 +25,7 @@ const WHEEL_THRESHOLD = 30;
 const DEBOUNCE_TIME = 800;
 const AUTO_SLIDE_DURATION = 13000; // 13 seconds for auto-slide
 
-// Video timestamps - kept for reference, clip already trimmed
+// Video path - using pre-clipped video
 const PAGE2_CLIP_PATH = '/assets/videos/page2_clip.mp4';
 
 const Index = () => {
@@ -245,7 +245,7 @@ const Index = () => {
         <Page5 isActive={currentPage === 5} onSlideshowComplete={handleSlideshowComplete} />
         <Page6 isActive={currentPage === 6} />
         <Page7 isActive={currentPage === 7} />
-        <Page8 isActive={currentPage === 8} audioRef={manganiyarsVideoRef} />
+        <Page8 isActive={currentPage === 8} audioRef={manganiyarsVideoRef} onSlideshowComplete={handleSlideshowComplete} />
         <Page9 isActive={currentPage === 9} />
         <Page10 isActive={currentPage === 10} />
         <Page11 isActive={currentPage === 11} />

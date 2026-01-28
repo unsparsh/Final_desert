@@ -55,21 +55,21 @@ export const Page12: React.FC<Page12Props> = ({ isActive }) => {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" />
       
-      {/* Contact Content */}
-      <div className={`relative z-10 h-full flex flex-col items-center justify-center px-8 transition-all duration-1000 ${
+      {/* Contact Content - LEFT ALIGNED, TOP LEFT CORNER */}
+      <div className={`absolute top-12 left-12 md:top-16 md:left-16 z-10 transition-all duration-1000 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}>
-        <div className="text-center max-w-2xl">
-          <h2 className="font-display text-2xl md:text-4xl font-light text-white mb-8 uppercase tracking-[0.2em]">
-            Booking Contact
+        <div className="text-left max-w-md">
+          <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-light text-white mb-8 tracking-[0.15em]">
+            BOOKING CONTACT
           </h2>
           
           <div className="space-y-4">
             <p className="font-display text-xl md:text-2xl text-white font-light">
-              Nadja Reiche
+              NADJA REICHE
             </p>
-            <p className="font-body text-sm md:text-base text-white/80 uppercase tracking-[0.15em]">
-              Bookings
+            <p className="font-display text-sm md:text-base text-white/80 tracking-[0.15em]">
+              BOOKINGS
             </p>
             <p className="font-display text-lg md:text-xl text-primary font-light">
               CARAVANA
@@ -78,13 +78,13 @@ export const Page12: React.FC<Page12Props> = ({ isActive }) => {
             <div className="pt-6 space-y-2">
               <a 
                 href="mailto:nadja@caravana.world"
-                className="block font-body text-base md:text-lg text-white hover:text-primary transition-colors"
+                className="block font-display text-base md:text-lg text-white hover:text-primary transition-colors"
               >
-                nadja@caravana.world
+                NADJA@CARAVANA.WORLD
               </a>
               <a 
                 href="tel:+4915144694744"
-                className="block font-body text-base md:text-lg text-white/80 hover:text-primary transition-colors"
+                className="block font-display text-base md:text-lg text-white/80 hover:text-primary transition-colors"
               >
                 +49 151 4469 4744
               </a>
@@ -98,13 +98,14 @@ export const Page12: React.FC<Page12Props> = ({ isActive }) => {
         href="https://www.linkedin.com/in/unsparsh/"
         target="_blank"
         rel="noopener noreferrer"
-        className={`absolute bottom-6 right-6 z-20 font-body text-xs text-white/50 hover:text-white/80 transition-all duration-500 ${
+        className={`absolute bottom-16 right-6 z-20 font-display text-xs text-white/50 hover:text-white/80 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        made by <span className="text-primary/70 hover:text-primary">unsparsh</span>
+        MADE BY <span className="text-primary/70 hover:text-primary">UNSPARSH</span>
       </a>
     </PageWrapper>
   );
 };
+
 

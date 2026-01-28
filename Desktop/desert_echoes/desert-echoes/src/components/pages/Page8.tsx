@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PageWrapper } from '@/components/PageWrapper';
 import { useAudio } from '@/contexts/AudioContext';
 
@@ -6,58 +6,88 @@ interface Page8Props {
   isActive: boolean;
   onVideoStart?: () => void;
   onVideoEnd?: () => void;
+  onSlideshowComplete?: () => void;
   audioRef?: React.RefObject<HTMLVideoElement>;
 }
 
-export const Page8: React.FC<Page8Props> = ({ isActive, onVideoStart, onVideoEnd, audioRef }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+// Images from public/assets/Slideshow folder
+// Add more photos to this folder and they will be included
+const images = [
+  "/assets/Slideshow/1.jpg",
+  "/assets/Slideshow/2.jpg",
+  "/assets/Slideshow/3a.png",
+  "/assets/Slideshow/3.jpg",
+  "/assets/Slideshow/4a.jpg",
+  "/assets/Slideshow/5.jpg",
+];
+
+const SLIDE_DURATION = 2000; // 2 seconds per slide - faster slideshow
+
+export const Page8: React.FC<Page8Props> = ({ isActive, onVideoStart, onVideoEnd, onSlideshowComplete, audioRef }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const { isMuted } = useAudio();
-  const wasMutedRef = useRef(false);
+  const hasCompletedRef = useRef(false);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isActive) {
-      // Store current mute state and pause main audio
-      if (audioRef?.current) {
-        wasMutedRef.current = audioRef.current.muted;
-        audioRef.current.muted = true;
-      }
-      
-      video.currentTime = 0;
-      video.play().then(() => {
-        onVideoStart?.();
-      }).catch(console.error);
-    } else {
-      video.pause();
+    if (!isActive) {
+      setCurrentIndex(0);
+      hasCompletedRef.current = false;
+      return;
     }
-  }, [isActive, onVideoStart, audioRef]);
 
-  const handleVideoEnd = () => {
-    // Resume main audio if it wasn't muted before
-    if (audioRef?.current && !isMuted) {
-      audioRef.current.muted = false;
-    }
-    onVideoEnd?.();
-  };
+    onVideoStart?.();
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        const nextIndex = prev + 1;
+        // When slideshow reaches end, navigate to next page
+        if (nextIndex >= images.length) {
+          if (!hasCompletedRef.current && onSlideshowComplete) {
+            hasCompletedRef.current = true;
+            setTimeout(() => onSlideshowComplete(), 500);
+          }
+          return prev; // Stay on last slide
+        }
+        return nextIndex;
+      });
+    }, SLIDE_DURATION);
+
+    return () => clearInterval(interval);
+  }, [isActive, onVideoStart]);
 
   return (
     <PageWrapper isActive={isActive}>
-      <div className="relative w-full h-full flex items-center justify-center">
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          playsInline
-          onEnded={handleVideoEnd}
-          poster="/placeholder.svg"
-        >
-          <source src="/assets/videos/page8_clip.mp4" type="video/mp4" />
-        </video>
+      <div className="relative w-full h-full overflow-hidden">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-all duration-700 ease-out ${
+              index === currentIndex
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-105'
+            }`}
+          >
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{ 
+                backgroundImage: `url(${image})`,
+                backgroundColor: 'hsl(var(--muted))',
+              }}
+            />
+          </div>
+        ))}
         
         {/* Subtle vignette */}
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_50%,hsl(var(--background)/0.4)_100%)]" />
+        
+        {/* Image counter */}
+        <div className="absolute bottom-24 left-8 md:left-16 z-20">
+          <p className="font-display text-sm tracking-[0.3em] text-foreground/60">
+            {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
+          </p>
+        </div>
       </div>
     </PageWrapper>
   );
 };
+

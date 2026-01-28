@@ -1,96 +1,70 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { PageWrapper } from '@/components/PageWrapper';
+import { useAudio } from '@/contexts/AudioContext';
 
 interface Page5Props {
   isActive: boolean;
   onSlideshowComplete?: () => void;
 }
 
-// Images from public/assets/Slideshow folder
-const images = [
-  "/assets/Slideshow/1.jpg",
-  "/assets/Slideshow/2.jpg",
-  "/assets/Slideshow/3a.png",
-  "/assets/Slideshow/3.jpg",
-  "/assets/Slideshow/4a.jpg",
-  "/assets/Slideshow/5.jpg",
-];
-
-const SLIDE_DURATION = 2500; // 2.5 seconds per slide
+// Video path - use the available video or replace with page5_video.mp4 when provided
+const VIDEO_PATH = '/assets/videos/page12_quotes.mp4';
 
 export const Page5: React.FC<Page5Props> = ({ isActive, onSlideshowComplete }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const hasCompletedRef = useRef(false);
+  const { isMuted } = useAudio();
 
   useEffect(() => {
     if (!isActive) {
-      setCurrentIndex(0);
       hasCompletedRef.current = false;
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
       return;
     }
 
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentIndex((prev) => {
-          const nextIndex = prev + 1;
-          
-          // If we've shown all slides, trigger navigation
-          if (nextIndex >= images.length) {
-            if (!hasCompletedRef.current && onSlideshowComplete) {
-              hasCompletedRef.current = true;
-              setTimeout(() => {
-                onSlideshowComplete();
-              }, 500);
-            }
-            return prev; // Stay on last slide
-          }
-          
-          return nextIndex;
-        });
-        setIsTransitioning(false);
-      }, 400);
-    }, SLIDE_DURATION);
+    // Start video when page becomes active
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(console.error);
+    }
+  }, [isActive, isMuted]);
 
-    return () => clearInterval(interval);
-  }, [isActive, onSlideshowComplete]);
+  // Handle mute changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const handleVideoEnd = () => {
+    if (!hasCompletedRef.current && onSlideshowComplete) {
+      hasCompletedRef.current = true;
+      onSlideshowComplete();
+    }
+  };
 
   return (
     <PageWrapper isActive={isActive}>
       <div className="relative w-full h-full overflow-hidden">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-all duration-700 ease-out ${
-              index === currentIndex
-                ? 'opacity-100 scale-100'
-                : index === (currentIndex - 1 + images.length) % images.length
-                ? 'opacity-0 scale-105'
-                : 'opacity-0 scale-95'
-            }`}
-          >
-            <div
-              className="w-full h-full bg-cover bg-center"
-              style={{ 
-                backgroundImage: `url(${image})`,
-                backgroundColor: 'hsl(var(--muted))',
-              }}
-            />
-            {/* Subtle parallax overlay */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-background/30"
-            />
-          </div>
-        ))}
-        
-        {/* Image counter */}
-        <div className="absolute bottom-24 left-8 md:left-16 z-20">
-          <p className="font-body text-sm tracking-[0.3em] text-foreground/60">
-            {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
-          </p>
-        </div>
+        {/* Background Video */}
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          playsInline
+          muted={isMuted}
+          onEnded={handleVideoEnd}
+        >
+          <source src={VIDEO_PATH} type="video/mp4" />
+        </video>
+
+        {/* Subtle overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-background/20" />
       </div>
     </PageWrapper>
   );
 };
+

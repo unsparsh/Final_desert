@@ -135,10 +135,10 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
 
   useEffect(() => {
     if (isActive) {
-      // Staggered text animations
-      setTimeout(() => setShowCaravana(true), 500);
-      setTimeout(() => setShowCenter(true), 1500);
-      setTimeout(() => setShowIndia(true), 2500);
+      // Staggered text animations - SLOWER, 3 stages
+      setTimeout(() => setShowCaravana(true), 1000);  // Stage 1: 1s
+      setTimeout(() => setShowCenter(true), 2500);    // Stage 2: 2.5s
+      setTimeout(() => setShowIndia(true), 4000);     // Stage 3: 4s
 
       // Start playing video if player is ready and not paused
       if (playerRef.current && playerRef.current.playVideo && !isPaused) {
@@ -172,9 +172,8 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
       
       {/* Text Content */}
       <div className="relative z-10 w-full h-full">
-        {/* CARAVANA - Top Right */}
         <div
-          className={`absolute top-12 right-12 md:top-16 md:right-16 transition-all duration-1000 ${
+          className={`absolute top-12 right-12 md:top-16 md:right-16 transition-all duration-1500 ${
             showCaravana ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
           }`}
         >
@@ -183,9 +182,8 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
           </h1>
         </div>
         
-        {/* Center Text */}
         <div
-          className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${
+          className={`absolute inset-0 flex items-center justify-center transition-all duration-1500 ${
             showCenter ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
         >
@@ -196,9 +194,8 @@ export const Page1: React.FC<Page1Props> = ({ isActive, audioRef, isPaused = fal
           </div>
         </div>
         
-        {/* INDIA - Bottom Right */}
         <div
-          className={`absolute bottom-12 right-12 md:bottom-16 md:right-16 transition-all duration-1000 ${
+          className={`absolute bottom-12 right-12 md:bottom-16 md:right-16 transition-all duration-1500 ${
             showIndia ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >

@@ -36,6 +36,16 @@ export const Page6: React.FC<Page6Props> = ({ isActive }) => {
     >
       <div className="max-w-4xl mx-auto px-6 md:px-8">
         <div className="space-y-5 md:space-y-6">
+          {/* Title */}
+          <h2
+            className={`font-display text-xl md:text-2xl lg:text-3xl font-light text-primary mb-6 transition-all duration-1000 tracking-[0.15em] ${
+              showPara1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ textShadow: '0 2px 20px hsl(var(--background) / 0.9)' }}
+          >
+            CARAVANA - THE MANGANIYAR MUSICIANS
+          </h2>
+          
           <p 
             className={`font-display text-base md:text-lg lg:text-xl font-light text-foreground/90 leading-relaxed transition-all duration-1000 ${
               showPara1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'

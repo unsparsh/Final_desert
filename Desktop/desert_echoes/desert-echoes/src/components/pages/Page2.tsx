@@ -19,15 +19,14 @@ export const Page2: React.FC<Page2Props> = ({ isActive, videoRef }) => {
 
   useEffect(() => {
     if (isActive) {
-      setTimeout(() => setIsVisible(true), 300);
+      // Slower fade-in animation
+      setTimeout(() => setIsVisible(true), 500);
 
-      // When page becomes active, ensure video is playing with proper settings
+      // When page becomes active, ensure video is playing
       if (videoRef.current) {
         videoRef.current.muted = isMuted;
-        // Start video from beginning when page becomes active
-        videoRef.current.currentTime = 0;
-        // Ensure video is playing
         if (videoRef.current.paused) {
+          videoRef.current.currentTime = 0;
           videoRef.current.play().catch(console.error);
         }
       }
