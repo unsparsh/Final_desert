@@ -1,4 +1,0 @@
-[build]
-  base = "Desktop/desert_echoes/desert-echoes"
-  command = "npm install && npm run build"
-  publish = "dist"

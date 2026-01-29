@@ -19,8 +19,8 @@ export const Page2: React.FC<Page2Props> = ({ isActive, videoRef }) => {
 
   useEffect(() => {
     if (isActive) {
-      // Slower fade-in animation
-      setTimeout(() => setIsVisible(true), 500);
+      // Softer fade-in animation with longer delay
+      setTimeout(() => setIsVisible(true), 800);
 
       // When page becomes active, ensure video is playing
       if (videoRef.current) {
@@ -62,13 +62,13 @@ export const Page2: React.FC<Page2Props> = ({ isActive, videoRef }) => {
         className="absolute inset-0 bg-black/30"
       />
       
-      {/* Text Content */}
+      {/* Text Content with softer fade-in */}
       <div className="relative z-10 w-full h-full flex items-center justify-center px-8 md:px-16 lg:px-24">
         <div
-          className={`text-center max-w-4xl transition-all duration-1500 ${
+          className={`text-center max-w-4xl transition-all duration-[2000ms] ease-out ${
             isVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-12'
+              ? 'opacity-100 translate-y-0 blur-0' 
+              : 'opacity-0 translate-y-8 blur-[2px]'
           }`}
         >
           <h2 className="font-display text-3xl md:text-5xl lg:text-7xl font-light text-foreground leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">

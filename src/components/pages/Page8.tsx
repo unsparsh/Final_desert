@@ -14,11 +14,16 @@ interface Page8Props {
 // Add more photos to this folder and they will be included
 const images = [
   "/assets/Slideshow/1.jpg",
-  "/assets/Slideshow/2.jpg",
-  "/assets/Slideshow/3a.png",
-  "/assets/Slideshow/3.jpg",
-  "/assets/Slideshow/4a.jpg",
-  "/assets/Slideshow/5.jpg",
+  "/assets/Slideshow/2...jpg",
+  "/assets/Slideshow/3...jpg",
+  "/assets/Slideshow/4.jpg",
+  "/assets/Slideshow/5...jpg",
+  "/assets/Slideshow/6....jpg",
+  "/assets/Slideshow/7...jpg",
+  "/assets/Slideshow/8...jpg",
+  "/assets/Slideshow/9.jpg",
+  "/assets/Slideshow/10.jpg",
+  "/assets/Slideshow/11.jpg",
 ];
 
 const SLIDE_DURATION = 2000; // 2 seconds per slide - faster slideshow
