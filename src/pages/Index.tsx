@@ -84,8 +84,8 @@ const Index = () => {
     }
 
     // Don't auto-slide if paused, on the last page, or landing screen is still showing
-    // Also skip Page5 (index 5) and PageQuotes (index 11) as they have their own slideshow-based navigation
-    if (showLanding || isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5 || currentPage === 11) {
+    // Also skip Page5 (index 5), Page8 (index 8), and PageQuotes (index 11) as they have their own slideshow-based navigation
+    if (showLanding || isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5 || currentPage === 8 || currentPage === 11) {
       return;
     }
 
