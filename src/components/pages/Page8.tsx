@@ -26,7 +26,7 @@ const images = [
   "/assets/Slideshow/11.jpg",
 ];
 
-const SLIDE_DURATION = 2000; // 2 seconds per slide - faster slideshow
+const SLIDE_DURATION = 4000; // 4 seconds per slide - more time to view each image
 
 export const Page8: React.FC<Page8Props> = ({ isActive, onVideoStart, onVideoEnd, onSlideshowComplete, audioRef }) => {
   const [currentIndex, setCurrentIndex] = useState(0);

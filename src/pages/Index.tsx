@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { HarmoniumPagination } from '@/components/HarmoniumPagination';
 import { SandTransition } from '@/components/SandTransition';
-
+import { LandingScreen } from '@/components/LandingScreen';
 import { PlayPauseToggle } from '@/components/PlayPauseToggle';
 import { AudioProvider } from '@/contexts/AudioContext';
 import { Page1 } from '@/components/pages/Page1';
@@ -46,6 +46,7 @@ const Index = () => {
   const [showSandTransition, setShowSandTransition] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
   
   const touchStartY = useRef(0);
   const lastNavigationTime = useRef(0);
@@ -121,9 +122,18 @@ const Index = () => {
     }
   }, [navigateToPage, isPaused]);
 
+  // Handle start experience from landing screen
+  const handleStartExperience = useCallback(() => {
+    setShowLanding(false);
+    setHasInteracted(true);
+    if (manganiyarsVideoRef.current) {
+      manganiyarsVideoRef.current.currentTime = 195;
+      manganiyarsVideoRef.current.play().catch(console.error);
+    }
+  }, []);
+
   // Start audio on first user interaction (browser autoplay policy)
   const handleFirstInteraction = useCallback(() => {
-
     if (!hasInteracted) {
       setHasInteracted(true);
       if (manganiyarsVideoRef.current && currentPage === 0) {
@@ -237,15 +247,9 @@ const Index = () => {
     }
   }, []);
 
-  // Start audio on mount
+  // Don't auto-play on mount - wait for landing screen interaction
   useEffect(() => {
-    if (manganiyarsVideoRef.current) {
-      manganiyarsVideoRef.current.currentTime = 195; // Start at 3:15
-      manganiyarsVideoRef.current.play().catch(() => {
-        // Autoplay blocked, will play on first interaction
-        console.log('Autoplay blocked, waiting for user interaction');
-      });
-    }
+    // Video will be started by handleStartExperience
   }, []);
 
   // Determine if video should be visible (on Page 1 for audio or Page 2 for video)
@@ -313,6 +317,9 @@ const Index = () => {
         
         {/* Play/Pause Toggle Button - Bottom Right */}
         <PlayPauseToggle isPaused={isPaused} onToggle={handleTogglePause} />
+        
+        {/* Landing Screen - shown on initial load */}
+        {showLanding && <LandingScreen onStart={handleStartExperience} />}
       </div>
     </AudioProvider>
   );
