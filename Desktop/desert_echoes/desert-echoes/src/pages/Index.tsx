@@ -37,7 +37,7 @@ const getPageDuration = (pageIndex: number): number => {
 };
 
 // Video path - using pre-clipped video
-const PAGE2_CLIP_PATH = '/assets/videos/page2_clip.mp4';
+const PAGE2_CLIP_PATH = '/assets/videos/page2_clip_compressed.mp4';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState(0);
