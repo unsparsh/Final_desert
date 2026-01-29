@@ -83,9 +83,9 @@ const Index = () => {
       autoSlideTimerRef.current = null;
     }
 
-    // Don't auto-slide if paused or on the last page
+    // Don't auto-slide if paused, on the last page, or landing screen is still showing
     // Also skip Page5 (index 5) and PageQuotes (index 11) as they have their own slideshow-based navigation
-    if (isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5 || currentPage === 11) {
+    if (showLanding || isPaused || currentPage >= TOTAL_PAGES - 1 || currentPage === 5 || currentPage === 11) {
       return;
     }
 
@@ -99,7 +99,7 @@ const Index = () => {
         clearTimeout(autoSlideTimerRef.current);
       }
     };
-  }, [currentPage, isPaused, navigateToPage]);
+  }, [currentPage, isPaused, showLanding, navigateToPage]);
 
   // Handler for Page5 slideshow completion (goes to page 6)
   const handleSlideshowComplete = useCallback(() => {
